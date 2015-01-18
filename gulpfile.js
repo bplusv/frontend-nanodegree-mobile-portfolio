@@ -1,46 +1,55 @@
 var gulp = require('gulp'),
+    del = require('del'),
     rename = require('gulp-rename'),
     uglify = require('gulp-uglify'),
     minifycss = require('gulp-minify-css'),
     minifyhtml = require('gulp-minify-html'),
-    del = require('del'),
     imagemin = require('gulp-imagemin'),
-    pngquant = require('imagemin-pngquant');;
+    pngquant = require('imagemin-pngquant'),
+    inlinesource = require('gulp-inline-source');
 
-gulp.task('minifyJS', function() {
-  gulp.src('js/*.js')
-  .pipe(uglify())
-  .pipe(gulp.dest('dist/js'));
+gulp.task('clean', [], function() {
+  return del('dist');
 });
 
-gulp.task('minifyCSS', function() {
-  gulp.src('css/*.css')
-  .pipe(minifycss())
-  .pipe(gulp.dest('dist/css'));
+gulp.task('minifyJS', [], function() {
+  return gulp.src('js/*.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('minifyHTML', function() {
-  gulp.src('*.html')
-  .pipe(minifyhtml({comments: false}))
-  .pipe(gulp.dest('dist'));
+gulp.task('minifyIMG', [], function() {
+  return gulp.src('img/*')
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{removeViewBox: false}],
+            use: [pngquant()]
+        }))
+        .pipe(gulp.dest('dist/img'));
 });
 
-gulp.task('minifyIMG', function() {
-  gulp.src('img/*')
-  .pipe(imagemin({
-      progressive: true,
-      svgoPlugins: [{removeViewBox: false}],
-      use: [pngquant()]
-  }))
-  .pipe(gulp.dest('dist/img'));
+gulp.task('minifyCSS', [],  function() {
+  return gulp.src('css/*.css')
+        .pipe(minifycss())
+        .pipe(gulp.dest('dist/css'));
 });
 
-gulp.task('clean', function() {
-  del('dist');
+gulp.task('inlineCSS', [], function() {
+  return gulp.src('*.html')
+        .pipe(inlinesource())
+        .pipe(minifyhtml())
+        .pipe(gulp.dest('dist'));
 });
+
+gulp.task('minifyHTML', ['inlineCSS'], function() {
+  return gulp.src('dist/*.html')
+        .pipe(minifyhtml())
+        .pipe(gulp.dest('dist'));
+});
+
 
 
 // Default Task
-gulp.task('default', ['clean', 'minifyJS', 'minifyCSS', 'minifyHTML', 'minifyIMG']);
+gulp.task('default', ['clean', 'minifyHTML', 'minifyCSS', 'minifyJS', 'minifyIMG']);
 
 
