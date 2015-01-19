@@ -43,8 +43,8 @@ Consulted a lot of materials on the matter, including the Google Performance gui
 * https://developers.google.com/speed/articles/javascript-dom
 * http://tech.pro/tutorial/1254/9-ways-to-optimize-your-front-end-performance
 
-
-
+### Optimized project hosted on github pages (sometimes ngrok response was slow, affecting PageSpeed):
+* http://lusv.github.io/projects/p4/
 
 
 
