@@ -509,11 +509,11 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  /* Find the elemnts & read the scroll position just once */
+  /* Find the elements & read the scroll position just once */
   var scrollTop = document.body.scrollTop;
   var items = document.querySelectorAll('.mover');
 
-  /* Update only the DOM left in the loop */
+  /* Update only the left property in the loop */
   for (var i = 0, l = items.length; i < l; i++) {
     var phase = Math.sin((scrollTop / 1250) + (i % 5));
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
