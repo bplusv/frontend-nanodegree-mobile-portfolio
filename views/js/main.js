@@ -402,17 +402,19 @@ var pizzaElementGenerator = function(i) {
 var resizePizzas = function(size) { 
   window.performance.mark("mark_start_resize");   // User Timing API function
 
+  var pizzaSizeLabel = document.getElementById("pizzaSize");
+
   // Changes the value for the size of the pizza above the slider
   function changeSliderLabel(size) {
     switch(size) {
       case "1":
-        document.querySelector("#pizzaSize").innerHTML = "Small";
+        pizzaSizeLabel.innerHTML = "Small";
         return;
       case "2":
-        document.querySelector("#pizzaSize").innerHTML = "Medium";
+        pizzaSizeLabel.innerHTML = "Medium";
         return;
       case "3":
-        document.querySelector("#pizzaSize").innerHTML = "Large";
+        pizzaSizeLabel.innerHTML = "Large";
         return;
       default:
         console.log("bug in changeSliderLabel");
@@ -424,8 +426,7 @@ var resizePizzas = function(size) {
   // Returns the size difference to change a pizza element from one size to another. Called by changePizzaSlices(size).
   function determineDx (elem, size) {
     var oldwidth = elem.offsetWidth;
-    /* Get windowwidth from #pizzaGenerator now, because #randomPizzas was temporarily removed */
-    var windowwidth = document.querySelector("#pizzaGenerator").offsetWidth;
+    var windowwidth = document.getElementById("randomPizzas").offsetWidth;
     var oldsize = oldwidth / windowwidth;
 
     // TODO: change to 3 sizes? no more xl?
@@ -451,20 +452,15 @@ var resizePizzas = function(size) {
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-     var pizzasDiv = document.getElementById("randomPizzas");
-     var parent = pizzasDiv.parentNode;
+    /* Calculate the new size of pizzas just once */
+    var pizzas = document.querySelectorAll(".randomPizzaContainer");
+    var dx = determineDx(pizzas[0], size);
+    var newwidth = (pizzas[0].offsetWidth + dx) + 'px';
 
-     /* Remove element from DOM to prevent additional reflows & repaints */
-     parent.removeChild(pizzasDiv);
-
-     for (var i = 0, l = pizzasDiv.children.length; i < l; i++) {
-        var pizza = pizzasDiv.children[i];
-        var dx = determineDx(pizza, size);
-        var newwidth = (pizza.offsetWidth + dx) + 'px';
-        pizza.style.width = newwidth;
-     }
-
-     parent.appendChild(pizzasDiv);
+    /* Update only the DOM width in the loop */
+    for (var i = 0, l = pizzas.length; i < l; i++) {
+      pizzas[i].style.width = newwidth;
+    }
   }
 
   changePizzaSizes(size);
@@ -513,9 +509,13 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
+  /* Find the elemnts & read the scroll position just once */
+  var scrollTop = document.body.scrollTop;
   var items = document.querySelectorAll('.mover');
-  for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+
+  /* Update only the DOM left in the loop */
+  for (var i = 0, l = items.length; i < l; i++) {
+    var phase = Math.sin((scrollTop / 1250) + (i % 5));
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
 
